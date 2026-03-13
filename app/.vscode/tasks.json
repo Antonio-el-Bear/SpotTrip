@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Django Backend",
+      "type": "shell",
+      "command": "venv\\Scripts\\activate; python manage.py runserver",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start SvelteKit Frontend",
+      "type": "shell",
+      "command": "pnpm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/tourguide-frontend-fresh"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Both (Parallel)",
+      "dependsOn": ["Start Django Backend", "Start SvelteKit Frontend"],
+      "dependsOrder": "parallel"
+    }
+  ]
+}

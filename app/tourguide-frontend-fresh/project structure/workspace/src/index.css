@@ -1,0 +1,19 @@
+:root {
+  --app-font-family: 'Source Sans 3', sans-serif;
+  --app-background: #1a2233;
+  --app-foreground: #f0f2f5;
+}
+
+body {
+  margin: 0;
+  font-family: var(--app-font-family);
+  background: var(--app-background);
+  color: var(--app-foreground);
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
