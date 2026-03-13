@@ -1,0 +1,24 @@
+# Ignore Python cache and build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore frontend build outputs
+app/tourguide-frontend-fresh/build/
+app/tourguide-frontend-fresh/static/
+
+# Ignore workspace backup environments
+app/tourguide-frontend-fresh/project structure/workspace/backend/venv-py314-backup/
+
+# Ignore SQLite database
+app/backend/db.sqlite3
+
+# Ignore logs
+*.log
+
+# Ignore node_modules
+app/tourguide-frontend-fresh/node_modules/
+
+# Ignore VS Code settings
+app/tourguide-frontend-fresh/.vscode/
