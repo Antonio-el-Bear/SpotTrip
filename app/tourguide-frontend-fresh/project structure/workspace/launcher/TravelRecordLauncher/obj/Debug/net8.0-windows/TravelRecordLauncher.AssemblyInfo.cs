@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TravelRecordLauncher")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+98b049e18e3114310b90bf9fa523e1d637c3f01b")]
 [assembly: System.Reflection.AssemblyProductAttribute("TravelRecordLauncher")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TravelRecordLauncher")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
