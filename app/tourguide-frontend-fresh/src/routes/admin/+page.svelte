@@ -1,23 +1,35 @@
 <script lang="ts">
   import { auth, isAdmin, isAuthenticated } from '$lib/stores/auth';
   import { apiFetch } from '$lib/utils/api';
-  import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
 
   type Stats = { users: number; tours: number; bookings: number; revenue: number };
   type StatKey = keyof Stats;
+  type UserRow = {
+    id: number;
+    username: string;
+    email: string;
+    role?: string;
+    date_joined?: string;
+  };
 
   let stats: Stats = { users: 0, tours: 0, bookings: 0, revenue: 0 };
-  let users: any[] = [];
+  let users: UserRow[] = [];
   let loading = true;
 
   onMount(async () => {
-    if (!$isAuthenticated) { goto('/auth/login'); return; }
-    if (!$isAdmin) { goto('/'); return; }
+    if (!$isAuthenticated) {
+      window.location.href = '/auth/login';
+      return;
+    }
+    if (!$isAdmin) {
+      window.location.href = '/';
+      return;
+    }
     try {
       const [statsData, usersData] = await Promise.all([
-        apiFetch('/api/admin/stats/', {}, $auth.token),
-        apiFetch('/api/users/', {}, $auth.token),
+        apiFetch<Stats>('/api/admin/stats/', {}, $auth.token),
+        apiFetch<UserRow[]>('/api/users/', {}, $auth.token),
       ]);
       stats = statsData;
       users = usersData;
@@ -57,7 +69,7 @@
 
   <!-- Stats -->
   <div class="mb-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-    {#each statCards as card}
+    {#each statCards as card (card.key)}
       <div class="rounded-2xl bg-white border border-stone-100 shadow-sm p-6">
         <div class="mb-3 flex items-center justify-between">
           <span class="text-2xl">{card.icon}</span>
@@ -74,7 +86,7 @@
   <div class="rounded-2xl bg-white border border-stone-100 shadow-sm overflow-hidden">
     <div class="flex items-center justify-between border-b border-stone-100 px-6 py-4">
       <h2 class="font-bold text-stone-800">All Users</h2>
-      <a href="/auth/roles" class="text-sm text-amber-700 hover:underline">Manage Roles →</a>
+      <button type="button" class="text-sm text-amber-700 hover:underline" on:click={() => { window.location.href = '/auth/roles'; }}>Manage Roles →</button>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
@@ -87,13 +99,13 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-stone-50">
-          {#each users as user}
+          {#each users as user (user.id)}
             <tr class="hover:bg-stone-50 transition-colors">
               <td class="px-6 py-4 font-medium text-stone-800">@{user.username}</td>
               <td class="px-6 py-4 text-stone-500">{user.email}</td>
               <td class="px-6 py-4">
                 <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize
-                  {roleStyle[user.role] || 'bg-stone-100 text-stone-600'}">
+                  {roleStyle[user.role ?? 'traveller'] || 'bg-stone-100 text-stone-600'}">
                   {user.role || 'traveller'}
                 </span>
               </td>

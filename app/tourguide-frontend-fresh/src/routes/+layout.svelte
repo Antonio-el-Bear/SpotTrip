@@ -14,9 +14,20 @@
 	import Crown from 'lucide-svelte/icons/crown';
 
 	type LayoutUser = {
+		id?: number;
 		avatar?: string;
 		email?: string;
+		first_name?: string;
+		last_name?: string;
 		full_name?: string;
+		role?: string;
+		username?: string;
+	};
+
+	type AuthState = {
+		user: LayoutUser | null;
+		token: string | null;
+		loading: boolean;
 	};
 
 	let user: LayoutUser | null = null;
@@ -24,7 +35,7 @@
 	let currentPageName = $page.url.pathname === '/' ? 'Home' : $page.url.pathname.replace('/', '');
 
 	onMount(() => {
-		const unsubscribe = auth.subscribe((state) => {
+		const unsubscribe = auth.subscribe((state: AuthState) => {
 			user = state.user;
 		});
 		const handleScroll = () => {
@@ -46,6 +57,8 @@
 
 	$: isHome = currentPageName === 'Home';
 	$: currentPageName = $page.url.pathname === '/' ? 'Home' : $page.url.pathname.replace('/', '');
+	$: displayName = user?.full_name || [user?.first_name, user?.last_name].filter(Boolean).join(' ') || user?.username || 'Traveler';
+	$: avatarFallback = displayName.charAt(0).toUpperCase() || 'T';
 	$: headerBg = isHome && !isScrolled ? 'bg-transparent' : 'bg-white/95 backdrop-blur-md shadow-sm';
 	$: textColor = isHome && !isScrolled ? 'text-white' : 'text-gray-900';
 </script>
@@ -76,18 +89,22 @@
 						<!-- User Dropdown (simplified for Svelte) -->
 						<div class="relative group">
 							<button class="relative h-10 w-10 rounded-full ring-2 ring-amber-200">
-								<img src={user.avatar} alt="avatar" class="h-10 w-10 rounded-full" />
+								{#if user?.avatar}
+									<img src={user.avatar} alt="avatar" class="h-10 w-10 rounded-full object-cover" />
+								{:else}
+									<span class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500 text-sm font-semibold text-white">{avatarFallback}</span>
+								{/if}
 							</button>
 							<div class="absolute right-0 mt-2 w-56 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto z-50">
 								<div class="px-3 py-2">
-									<p class="text-sm font-medium">{user.full_name || 'Traveler'}</p>
-									<p class="text-xs text-gray-500">{user.email}</p>
+									<p class="text-sm font-medium">{displayName}</p>
+									<p class="text-xs text-gray-500">{user?.email || 'Signed in'}</p>
 								</div>
 								<div class="border-t my-1"></div>
 								<a href="/auth/profile" class="flex items-center px-4 py-2 hover:bg-gray-100"><User class="w-4 h-4 mr-2" />My Profile</a>
-								<a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100"><BookMarked class="w-4 h-4 mr-2" />My Bookmarks</a>
-								<a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100"><Settings class="w-4 h-4 mr-2" />Settings</a>
-								<a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100 text-amber-600"><Crown class="w-4 h-4 mr-2" />Upgrade Plan</a>
+								<a href="/bookings" class="flex items-center px-4 py-2 hover:bg-gray-100"><BookMarked class="w-4 h-4 mr-2" />My Bookings</a>
+								<a href="/dashboard" class="flex items-center px-4 py-2 hover:bg-gray-100"><Settings class="w-4 h-4 mr-2" />Dashboard</a>
+								<a href="/pricing" class="flex items-center px-4 py-2 hover:bg-gray-100 text-amber-600"><Crown class="w-4 h-4 mr-2" />Upgrade Plan</a>
 								<div class="border-t my-1"></div>
 								<button class="flex items-center px-4 py-2 w-full text-red-600 hover:bg-gray-100" on:click={() => auth.logout()}><LogOut class="w-4 h-4 mr-2" />Log Out</button>
 							</div>
@@ -120,28 +137,28 @@
 				<div>
 					<h4 class="font-semibold mb-4">Explore</h4>
 					<ul class="space-y-2 text-gray-400 text-sm">
-						<li><a href="#" class="hover:text-amber-400">Destinations</a></li>
-						<li><a href="#" class="hover:text-amber-400">Forum</a></li>
-						<li><a href="#" class="hover:text-amber-400">Travel Guides</a></li>
-						<li><a href="#" class="hover:text-amber-400">Inspiration</a></li>
+						<li><a href="/tours" class="hover:text-amber-400">Destinations</a></li>
+						<li><a href="/about" class="hover:text-amber-400">Forum</a></li>
+						<li><a href="/tours" class="hover:text-amber-400">Travel Guides</a></li>
+						<li><a href="/about" class="hover:text-amber-400">Inspiration</a></li>
 					</ul>
 				</div>
 				<div>
 					<h4 class="font-semibold mb-4">Tools</h4>
 					<ul class="space-y-2 text-gray-400 text-sm">
-						<li><a href="#" class="hover:text-amber-400">Budget Calculator</a></li>
-						<li><a href="#" class="hover:text-amber-400">Trip Planner</a></li>
-						<li><a href="#" class="hover:text-amber-400">Reminders</a></li>
-						<li><a href="#" class="hover:text-amber-400">Travel Notes</a></li>
+						<li><a href="/pricing" class="hover:text-amber-400">Budget Calculator</a></li>
+						<li><a href="/dashboard" class="hover:text-amber-400">Trip Planner</a></li>
+						<li><a href="/bookings" class="hover:text-amber-400">Reminders</a></li>
+						<li><a href="/contact" class="hover:text-amber-400">Travel Notes</a></li>
 					</ul>
 				</div>
 				<div>
 					<h4 class="font-semibold mb-4">Company</h4>
 					<ul class="space-y-2 text-gray-400 text-sm">
-						<li><a href="#" class="hover:text-amber-400">About Us</a></li>
-						<li><a href="#" class="hover:text-amber-400">Contact</a></li>
-						<li><a href="#" class="hover:text-amber-400">Privacy Policy</a></li>
-						<li><a href="#" class="hover:text-amber-400">Terms of Service</a></li>
+						<li><a href="/about" class="hover:text-amber-400">About Us</a></li>
+						<li><a href="/contact" class="hover:text-amber-400">Contact</a></li>
+						<li><a href="/disclaimer" class="hover:text-amber-400">Privacy Policy</a></li>
+						<li><a href="/disclaimer" class="hover:text-amber-400">Terms of Service</a></li>
 					</ul>
 				</div>
 			</div>

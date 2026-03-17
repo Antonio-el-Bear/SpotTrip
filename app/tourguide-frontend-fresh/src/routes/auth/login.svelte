@@ -100,10 +100,10 @@
     <button class="login-btn signup" on:click={() => goto('/auth/register')}>Sign Up</button>
   </div>
   <div class="user-switcher">
-    {#each users as userObj}
-      <div class="user-icon {selectedUser === userObj.name ? 'selected' : ''}" on:click={() => switchUser(userObj)}>
+    {#each users as userObj (userObj.name)}
+      <button type="button" class="user-icon {selectedUser === userObj.name ? 'selected' : ''}" on:click={() => switchUser(userObj)}>
         <svelte:component this={userObj.icon} size={28} color="#0033a0" />
-      </div>
+      </button>
     {/each}
   </div>
   <div class="user-label">Current: {selectedUser}</div>

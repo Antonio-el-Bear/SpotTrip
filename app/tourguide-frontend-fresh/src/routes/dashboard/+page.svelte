@@ -1,10 +1,9 @@
 <script lang="ts">
   import { isAuthenticated } from '$lib/stores/auth';
-  import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
 
   onMount(() => {
-    if (!$isAuthenticated) goto('/auth/login');
+    if (!$isAuthenticated) window.location.href = '/auth/login';
   });
 </script>
 

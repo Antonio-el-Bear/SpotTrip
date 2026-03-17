@@ -6,16 +6,16 @@
     <p class="mb-4 text-stone-700">Have questions, feedback, or need help? Reach out to our team and we’ll get back to you as soon as possible.</p>
     <form class="space-y-5">
       <div>
-        <label class="block text-sm font-medium text-stone-700 mb-1">Name</label>
-        <input type="text" class="w-full rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200" required />
+        <label for="contact-name" class="block text-sm font-medium text-stone-700 mb-1">Name</label>
+        <input id="contact-name" type="text" class="w-full rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200" required />
       </div>
       <div>
-        <label class="block text-sm font-medium text-stone-700 mb-1">Email</label>
-        <input type="email" class="w-full rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200" required />
+        <label for="contact-email" class="block text-sm font-medium text-stone-700 mb-1">Email</label>
+        <input id="contact-email" type="email" class="w-full rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200" required />
       </div>
       <div>
-        <label class="block text-sm font-medium text-stone-700 mb-1">Message</label>
-        <textarea class="w-full rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200" rows="4" required></textarea>
+        <label for="contact-message" class="block text-sm font-medium text-stone-700 mb-1">Message</label>
+        <textarea id="contact-message" class="w-full rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200" rows="4" required></textarea>
       </div>
       <button type="submit" class="w-full rounded-xl bg-amber-700 px-4 py-3 text-sm font-semibold text-white hover:bg-amber-600 transition-colors">Send Message</button>
     </form>
