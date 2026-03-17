@@ -1,29 +1,27 @@
-
-<script>
-  // Add profile logic here
-</script>
-
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
-  let user = null;
+
+  let user: Record<string, unknown> | null = null;
   let error = '';
+  let loading = true;
+
   onMount(async () => {
-    const res = await fetch('http://localhost:8000/api/users/me/', {
-      credentials: 'include'
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/users/me/', {
+        credentials: 'include'
+      });
+
+      if (!res.ok) {
+        throw new Error('Not authenticated or error fetching profile.');
+      }
+
       user = await res.json();
-    } else {
-      error = 'Not authenticated or error fetching profile.';
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Not authenticated or error fetching profile.';
+    } finally {
+      loading = false;
     }
   });
-</script>
-  if (res.ok) {
-    user = await res.json();
-  } else {
-    error = 'Not authenticated or error fetching profile.';
-  }
-});
 </script>
 
 {#if user}
@@ -31,6 +29,8 @@
   <pre>{JSON.stringify(user, null, 2)}</pre>
 {:else if error}
   <p style="color:red">{error}</p>
-{:else}
+{:else if loading}
   <p>Loading...</p>
+{:else}
+  <p>No profile data available.</p>
 {/if}

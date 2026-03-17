@@ -4,9 +4,22 @@
 	import { auth } from '$lib/stores/auth';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { Compass, Menu, X, User, Bell, BookMarked, LogOut, Settings, Crown } from 'lucide-svelte';
-	import { get } from 'svelte/store';
-	let user = null;
+	import Compass from 'lucide-svelte/icons/compass';
+	import Menu from 'lucide-svelte/icons/menu';
+	import User from 'lucide-svelte/icons/user';
+	import Bell from 'lucide-svelte/icons/bell';
+	import BookMarked from 'lucide-svelte/icons/book-marked';
+	import LogOut from 'lucide-svelte/icons/log-out';
+	import Settings from 'lucide-svelte/icons/settings';
+	import Crown from 'lucide-svelte/icons/crown';
+
+	type LayoutUser = {
+		avatar?: string;
+		email?: string;
+		full_name?: string;
+	};
+
+	let user: LayoutUser | null = null;
 	let isScrolled = false;
 	let currentPageName = $page.url.pathname === '/' ? 'Home' : $page.url.pathname.replace('/', '');
 
@@ -32,6 +45,7 @@
 	];
 
 	$: isHome = currentPageName === 'Home';
+	$: currentPageName = $page.url.pathname === '/' ? 'Home' : $page.url.pathname.replace('/', '');
 	$: headerBg = isHome && !isScrolled ? 'bg-transparent' : 'bg-white/95 backdrop-blur-md shadow-sm';
 	$: textColor = isHome && !isScrolled ? 'text-white' : 'text-gray-900';
 </script>

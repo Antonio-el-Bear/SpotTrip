@@ -4,7 +4,10 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
 
-  let stats = { users: 0, tours: 0, bookings: 0, revenue: 0 };
+  type Stats = { users: number; tours: number; bookings: number; revenue: number };
+  type StatKey = keyof Stats;
+
+  let stats: Stats = { users: 0, tours: 0, bookings: 0, revenue: 0 };
   let users: any[] = [];
   let loading = true;
 
@@ -30,7 +33,7 @@
     }
   });
 
-  const statCards = [
+  const statCards: Array<{ label: string; key: StatKey; icon: string; color: string }> = [
     { label: 'Total Users', key: 'users', icon: '👥', color: 'bg-blue-50 text-blue-700' },
     { label: 'Active Tours', key: 'tours', icon: '🗺️', color: 'bg-green-50 text-green-700' },
     { label: 'Bookings', key: 'bookings', icon: '📅', color: 'bg-amber-50 text-amber-700' },

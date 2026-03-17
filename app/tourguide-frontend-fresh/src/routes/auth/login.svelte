@@ -1,15 +1,23 @@
 
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { User, Users } from 'lucide-svelte';
+  import User from 'lucide-svelte/icons/user';
+  import Users from 'lucide-svelte/icons/users';
+
+  type UserOption = {
+    name: string;
+    icon: typeof User;
+  };
+
   let selectedUser = 'guest';
-  const users = [
+  const users: UserOption[] = [
     { name: 'Guest', icon: User },
     { name: 'Admin', icon: Users },
     { name: 'Traveler', icon: User },
     { name: 'Manager', icon: Users }
   ];
-  function switchUser(user) {
+
+  function switchUser(user: UserOption) {
     selectedUser = user.name;
   }
 </script>
