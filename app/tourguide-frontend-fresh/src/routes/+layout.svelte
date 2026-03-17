@@ -1,168 +1,319 @@
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { auth } from '$lib/stores/auth';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
+	import { auth } from '$lib/stores/auth';
 	import Compass from 'lucide-svelte/icons/compass';
-	import Menu from 'lucide-svelte/icons/menu';
-	import User from 'lucide-svelte/icons/user';
-	import Bell from 'lucide-svelte/icons/bell';
-	import BookMarked from 'lucide-svelte/icons/book-marked';
-	import LogOut from 'lucide-svelte/icons/log-out';
-	import Settings from 'lucide-svelte/icons/settings';
-	import Crown from 'lucide-svelte/icons/crown';
 
 	type LayoutUser = {
-		id?: number;
-		avatar?: string;
 		email?: string;
 		first_name?: string;
 		last_name?: string;
 		full_name?: string;
-		role?: string;
 		username?: string;
 	};
 
 	type AuthState = {
 		user: LayoutUser | null;
-		token: string | null;
-		loading: boolean;
 	};
+
+	const navLinks = [
+		{ label: 'Home', href: '/' },
+		{ label: 'Destinations', href: '/tours' },
+		{ label: 'Members', href: '/dashboard' },
+		{ label: 'Bookings', href: '/bookings' },
+		{ label: 'About', href: '/about' },
+		{ label: 'Contact', href: '/contact' }
+	];
 
 	let user: LayoutUser | null = null;
 	let isScrolled = false;
-	let currentPageName = $page.url.pathname === '/' ? 'Home' : $page.url.pathname.replace('/', '');
 
 	onMount(() => {
 		const unsubscribe = auth.subscribe((state: AuthState) => {
 			user = state.user;
 		});
+
 		const handleScroll = () => {
-			isScrolled = window.scrollY > 50;
+			isScrolled = window.scrollY > 12;
 		};
+
+		handleScroll();
 		window.addEventListener('scroll', handleScroll);
+
 		return () => {
 			window.removeEventListener('scroll', handleScroll);
 			unsubscribe();
 		};
 	});
 
-	const navLinks = [
-		{ name: 'Destinations', page: '/' },
-		{ name: 'Forum', page: '/' },
-		{ name: 'Travel Tools', page: '/' },
-		{ name: 'Pricing', page: '/' }
-	];
-
-	$: isHome = currentPageName === 'Home';
-	$: currentPageName = $page.url.pathname === '/' ? 'Home' : $page.url.pathname.replace('/', '');
-	$: displayName = user?.full_name || [user?.first_name, user?.last_name].filter(Boolean).join(' ') || user?.username || 'Traveler';
-	$: avatarFallback = displayName.charAt(0).toUpperCase() || 'T';
-	$: headerBg = isHome && !isScrolled ? 'bg-transparent' : 'bg-white/95 backdrop-blur-md shadow-sm';
-	$: textColor = isHome && !isScrolled ? 'text-white' : 'text-gray-900';
+	$: pathname = $page.url.pathname;
+	$: isHome = pathname === '/';
+	$: headerClass = isHome && !isScrolled ? 'header header--transparent' : 'header header--solid';
+	$: displayName = user?.full_name || [user?.first_name, user?.last_name].filter(Boolean).join(' ') || user?.username || 'Guest';
 </script>
 
-<div class="min-h-screen">
-	<!-- Header -->
-	<header class={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg}`}>
-		<div class="max-w-7xl mx-auto px-4">
-			<div class="flex items-center justify-between h-20">
-				<!-- Logo -->
-				<a href="/" class="flex items-center gap-2">
-					<div class={`w-10 h-10 rounded-xl flex items-center justify-center ${isHome && !isScrolled ? 'bg-white/20' : 'bg-amber-500'}`}>
-						<Compass class={`w-6 h-6 ${isHome && !isScrolled ? 'text-white' : 'text-white'}`} />
+<svelte:head>
+	<title>TourGuide</title>
+</svelte:head>
+
+<div class="app-shell">
+	<header class={headerClass}>
+		<div class="shell-container header__inner">
+			<a class="brand" href="/">
+				<span class="brand__mark"><Compass size={20} /></span>
+				<span>
+					<strong>TourGuide</strong>
+					<small>Structured Travel Documentation</small>
+				</span>
+			</a>
+
+			<nav class="nav">
+				{#each navLinks as link}
+					<a class:nav__link--active={pathname === link.href} class="nav__link" href={link.href}>{link.label}</a>
+				{/each}
+			</nav>
+
+			<div class="header__actions">
+				{#if user}
+					<div class="user-chip">
+						<span class="user-chip__label">Signed in</span>
+						<strong>{displayName}</strong>
 					</div>
-					<span class={`text-xl font-bold ${textColor}`}>Wanderlust</span>
-				</a>
-				<!-- Desktop Navigation -->
-				<nav class="hidden md:flex items-center gap-8">
-					{#each navLinks as link}
-						<a href={link.page} class={`text-sm font-medium transition-colors ${isHome && !isScrolled ? 'text-white/80 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}>{link.name}</a>
-					{/each}
-				</nav>
-				<!-- Right Side -->
-				<div class="flex items-center gap-3">
-					{#if user}
-						<button class={`rounded-full p-2 ${isHome && !isScrolled ? 'text-white hover:bg-white/20' : ''}`}><Bell class="w-5 h-5" /></button>
-						<button class={`rounded-full p-2 ${isHome && !isScrolled ? 'text-white hover:bg-white/20' : ''}`}><BookMarked class="w-5 h-5" /></button>
-						<!-- User Dropdown (simplified for Svelte) -->
-						<div class="relative group">
-							<button class="relative h-10 w-10 rounded-full ring-2 ring-amber-200">
-								{#if user?.avatar}
-									<img src={user.avatar} alt="avatar" class="h-10 w-10 rounded-full object-cover" />
-								{:else}
-									<span class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500 text-sm font-semibold text-white">{avatarFallback}</span>
-								{/if}
-							</button>
-							<div class="absolute right-0 mt-2 w-56 bg-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto z-50">
-								<div class="px-3 py-2">
-									<p class="text-sm font-medium">{displayName}</p>
-									<p class="text-xs text-gray-500">{user?.email || 'Signed in'}</p>
-								</div>
-								<div class="border-t my-1"></div>
-								<a href="/auth/profile" class="flex items-center px-4 py-2 hover:bg-gray-100"><User class="w-4 h-4 mr-2" />My Profile</a>
-								<a href="/bookings" class="flex items-center px-4 py-2 hover:bg-gray-100"><BookMarked class="w-4 h-4 mr-2" />My Bookings</a>
-								<a href="/dashboard" class="flex items-center px-4 py-2 hover:bg-gray-100"><Settings class="w-4 h-4 mr-2" />Dashboard</a>
-								<a href="/pricing" class="flex items-center px-4 py-2 hover:bg-gray-100 text-amber-600"><Crown class="w-4 h-4 mr-2" />Upgrade Plan</a>
-								<div class="border-t my-1"></div>
-								<button class="flex items-center px-4 py-2 w-full text-red-600 hover:bg-gray-100" on:click={() => auth.logout()}><LogOut class="w-4 h-4 mr-2" />Log Out</button>
-							</div>
-						</div>
-					{:else}
-						<button class={`hidden sm:flex rounded-full px-6 ${isHome && !isScrolled ? 'text-white hover:bg-white/20' : ''}`} on:click={() => goto('/auth/login')}>Sign In</button>
-						<button class="bg-amber-500 hover:bg-amber-600 text-white rounded-full px-6" on:click={() => goto('/auth/login')}>Get Started</button>
-					{/if}
-					<!-- Mobile Menu (simplified) -->
-					<button class={`md:hidden rounded-full p-2 ${isHome && !isScrolled ? 'text-white hover:bg-white/20' : ''}`}><Menu class="w-6 h-6" /></button>
-				</div>
+				{:else}
+					<a class="button button--ghost" href="/dashboard">Member Area</a>
+					<a class="button button--gold" href="/contact">Get Started</a>
+				{/if}
 			</div>
 		</div>
 	</header>
-	<!-- Main Content -->
-	<main class="pt-20"> <slot /> </main>
-	<!-- Footer -->
-	<footer class="bg-gray-900 text-white py-16 px-4">
-		<div class="max-w-7xl mx-auto">
-			<div class="grid grid-cols-1 md:grid-cols-4 gap-10">
-				<div>
-					<div class="flex items-center gap-2 mb-4">
-						<div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
-							<Compass class="w-6 h-6 text-white" />
-						</div>
-						<span class="text-xl font-bold">Wanderlust</span>
-					</div>
-					<p class="text-gray-400 text-sm">Your ultimate travel companion. Plan, explore, and share your adventures with fellow travelers worldwide.</p>
-				</div>
-				<div>
-					<h4 class="font-semibold mb-4">Explore</h4>
-					<ul class="space-y-2 text-gray-400 text-sm">
-						<li><a href="/tours" class="hover:text-amber-400">Destinations</a></li>
-						<li><a href="/about" class="hover:text-amber-400">Forum</a></li>
-						<li><a href="/tours" class="hover:text-amber-400">Travel Guides</a></li>
-						<li><a href="/about" class="hover:text-amber-400">Inspiration</a></li>
-					</ul>
-				</div>
-				<div>
-					<h4 class="font-semibold mb-4">Tools</h4>
-					<ul class="space-y-2 text-gray-400 text-sm">
-						<li><a href="/pricing" class="hover:text-amber-400">Budget Calculator</a></li>
-						<li><a href="/dashboard" class="hover:text-amber-400">Trip Planner</a></li>
-						<li><a href="/bookings" class="hover:text-amber-400">Reminders</a></li>
-						<li><a href="/contact" class="hover:text-amber-400">Travel Notes</a></li>
-					</ul>
-				</div>
-				<div>
-					<h4 class="font-semibold mb-4">Company</h4>
-					<ul class="space-y-2 text-gray-400 text-sm">
-						<li><a href="/about" class="hover:text-amber-400">About Us</a></li>
-						<li><a href="/contact" class="hover:text-amber-400">Contact</a></li>
-						<li><a href="/disclaimer" class="hover:text-amber-400">Privacy Policy</a></li>
-						<li><a href="/disclaimer" class="hover:text-amber-400">Terms of Service</a></li>
-					</ul>
-				</div>
+
+	<main>
+		<slot />
+	</main>
+
+	<footer class="footer">
+		<div class="shell-container footer__grid">
+			<div>
+				<p class="footer__eyebrow">TourGuide</p>
+				<p class="footer__copy">
+					A structured platform for documented travel knowledge, experienced trip authors, and
+					practical planning support.
+				</p>
 			</div>
-			<div class="border-t border-gray-800 mt-10 pt-8 text-center text-gray-500 text-sm"></div>
+			<div class="footer__links">
+				<a href="/about">About</a>
+				<a href="/tours">Destinations</a>
+				<a href="/dashboard">Dashboard</a>
+				<a href="/contact">Contact</a>
+			</div>
 		</div>
+		<div class="shell-container footer__bottom">© 2026 TourGuide · Structured Travel Documentation Platform</div>
 	</footer>
 </div>
+
+<style>
+	:global(body) {
+		margin: 0;
+		font-family: 'Source Sans 3', sans-serif;
+		background: #1a2233;
+		color: #f0f2f5;
+	}
+
+	:global(a) {
+		color: inherit;
+	}
+
+	.app-shell {
+		min-height: 100vh;
+		background:
+			radial-gradient(circle at top, rgba(212, 160, 23, 0.14), transparent 24%),
+			linear-gradient(180deg, #1a2233 0%, #121927 100%);
+	}
+
+	.shell-container {
+		width: min(1200px, calc(100% - 2rem));
+		margin: 0 auto;
+	}
+
+	.header {
+		position: sticky;
+		top: 0;
+		z-index: 20;
+		transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.header--transparent {
+		background: transparent;
+		border-bottom: 1px solid transparent;
+	}
+
+	.header--solid {
+		background: rgba(18, 25, 39, 0.94);
+		backdrop-filter: blur(14px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+	}
+
+	.header__inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 1rem 0;
+	}
+
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.85rem;
+		text-decoration: none;
+	}
+
+	.brand__mark {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 999px;
+		background: linear-gradient(135deg, #d4a017 0%, #b8860b 100%);
+		color: #fff;
+		box-shadow: 0 10px 24px rgba(212, 160, 23, 0.28);
+	}
+
+	.brand strong {
+		display: block;
+		font-size: 1.05rem;
+		font-weight: 700;
+		letter-spacing: 0.03em;
+	}
+
+	.brand small,
+	.user-chip__label,
+	.footer__eyebrow {
+		display: block;
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: #d4a017;
+	}
+
+	.nav {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 1.15rem;
+	}
+
+	.nav__link {
+		text-decoration: none;
+		font-size: 0.95rem;
+		color: rgba(240, 242, 245, 0.72);
+		transition: color 0.2s ease;
+	}
+
+	.nav__link:hover,
+	.nav__link--active {
+		color: #fff;
+	}
+
+	.header__actions {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.7rem 1rem;
+		border-radius: 0.55rem;
+		text-decoration: none;
+		font-size: 0.9rem;
+		font-weight: 700;
+	}
+
+	.button--ghost {
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		color: #f0f2f5;
+	}
+
+	.button--gold {
+		background: #d4a017;
+		color: #fff;
+	}
+
+	.user-chip {
+		padding: 0.7rem 0.9rem;
+		border-radius: 0.8rem;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.footer {
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		background: rgba(11, 17, 28, 0.9);
+	}
+
+	.footer__grid {
+		display: grid;
+		grid-template-columns: 1.6fr 1fr;
+		gap: 2rem;
+		padding: 2rem 0 1rem;
+	}
+
+	.footer__copy,
+	.footer__bottom {
+		color: rgba(240, 242, 245, 0.62);
+		line-height: 1.65;
+	}
+
+	.footer__links {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 1rem;
+	}
+
+	.footer__links a {
+		text-decoration: none;
+		color: rgba(240, 242, 245, 0.72);
+	}
+
+	.footer__bottom {
+		padding: 0 0 2rem;
+		font-size: 0.9rem;
+	}
+
+	@media (max-width: 900px) {
+		.header__inner,
+		.footer__grid {
+			grid-template-columns: 1fr;
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.nav,
+		.footer__links {
+			justify-content: flex-start;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.shell-container {
+			width: min(100% - 1.25rem, 1200px);
+		}
+
+		.header__actions {
+			width: 100%;
+			justify-content: space-between;
+		}
+
+		.button {
+			flex: 1;
+		}
+	}
+</style>
