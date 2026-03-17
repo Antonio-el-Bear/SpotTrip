@@ -3,88 +3,235 @@
   import { apiFetch } from '$lib/utils/api';
   import { onMount } from 'svelte';
 
-  let tours: any[] = [];
+  type Tour = {
+    id: number;
+    title: string;
+    location: string;
+    duration: string;
+    price: number;
+    rating: number;
+    emoji?: string;
+  };
+
+  const fallbackTours: Tour[] = [
+    { id: 1, title: 'Cape Winelands Day Tour', location: 'Stellenbosch, SA', duration: '8 hrs', price: 1200, rating: 4.9, emoji: '🍷' },
+    { id: 2, title: 'Drakensberg Hike', location: 'KwaZulu-Natal, SA', duration: '2 days', price: 3500, rating: 4.8, emoji: '🏔️' },
+    { id: 3, title: 'Kruger Safari', location: 'Mpumalanga, SA', duration: '3 days', price: 8900, rating: 5.0, emoji: '🦁' },
+    { id: 4, title: 'Garden Route Road Trip', location: 'Western Cape, SA', duration: '5 days', price: 12000, rating: 4.7, emoji: '🌊' },
+    { id: 5, title: 'Joburg City & Soweto', location: 'Johannesburg, SA', duration: '6 hrs', price: 950, rating: 4.6, emoji: '🏙️' },
+    { id: 6, title: 'Tsitsikamma Canopy Tour', location: 'Eastern Cape, SA', duration: '4 hrs', price: 1800, rating: 4.8, emoji: '🌲' }
+  ];
+  const loadingSkeletons = Array.from({ length: 6 }, (_, index) => index);
+
+  let tours: Tour[] = [];
   let loading = true;
   let search = '';
-  let error = '';
 
   onMount(async () => {
     try {
-      tours = await apiFetch('/api/tours/', {}, $auth.token);
-    } catch (e: any) {
-      error = e.message;
-      // Fallback sample data for UI preview
-      tours = [
-        { id: 1, title: 'Cape Winelands Day Tour', location: 'Stellenbosch, SA', duration: '8 hrs', price: 1200, rating: 4.9, emoji: '🍷' },
-        { id: 2, title: 'Drakensberg Hike', location: 'KwaZulu-Natal, SA', duration: '2 days', price: 3500, emoji: '🏔️', rating: 4.8 },
-        { id: 3, title: 'Kruger Safari', location: 'Mpumalanga, SA', duration: '3 days', price: 8900, emoji: '🦁', rating: 5.0 },
-        { id: 4, title: 'Garden Route Road Trip', location: 'Western Cape, SA', duration: '5 days', price: 12000, emoji: '🌊', rating: 4.7 },
-        { id: 5, title: 'Joburg City & Soweto', location: 'Johannesburg, SA', duration: '6 hrs', price: 950, emoji: '🏙️', rating: 4.6 },
-        { id: 6, title: 'Tsitsikamma Canopy Tour', location: 'Eastern Cape, SA', duration: '4 hrs', price: 1800, emoji: '🌲', rating: 4.8 },
-      ];
+      tours = await apiFetch<Tour[]>('/api/tours/', {}, $auth.token);
+    } catch {
+      tours = fallbackTours;
     } finally {
       loading = false;
     }
   });
 
-  $: filtered = tours.filter(t =>
-    t.title?.toLowerCase().includes(search.toLowerCase()) ||
-    t.location?.toLowerCase().includes(search.toLowerCase())
+  $: filtered = tours.filter((tour) =>
+    tour.title.toLowerCase().includes(search.toLowerCase()) ||
+    tour.location.toLowerCase().includes(search.toLowerCase())
   );
 </script>
 
 <svelte:head><title>Explore Tours · TourGuide</title></svelte:head>
 
-<!-- Header -->
-<div class="bg-gradient-to-r from-amber-900 to-amber-700 px-4 py-14 text-center sm:px-6">
-  <h1 class="mb-3 text-4xl font-extrabold text-white">Explore Tours</h1>
-  <p class="mb-8 text-amber-200">Discover handpicked adventures from local experts.</p>
-  <div class="mx-auto max-w-lg">
+<section class="tours-hero">
+  <div class="page-shell hero-inner">
+    <p class="eyebrow">Documented Travel Archive</p>
+    <h1>Explore Tours</h1>
+    <p class="hero-copy">Discover structured travel records, destination routes, and practical trip options from the TourGuide archive.</p>
+    <div class="search-shell">
     <input
       type="search"
       bind:value={search}
       placeholder="Search by destination or tour name..."
-      class="w-full rounded-xl border-0 bg-white px-5 py-3.5 text-stone-800 shadow-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+      class="search-input"
     />
+    </div>
   </div>
-</div>
+</section>
 
-<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+<section class="tours-content">
+  <div class="page-shell">
   {#if loading}
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {#each Array(6) as _}
-        <div class="h-64 rounded-2xl bg-stone-200 animate-pulse"></div>
+    <div class="tour-grid">
+      {#each loadingSkeletons as skeleton (skeleton)}
+        <div class="tour-skeleton"></div>
       {/each}
     </div>
   {:else}
-    <p class="mb-6 text-sm text-stone-500">{filtered.length} tour{filtered.length !== 1 ? 's' : ''} found</p>
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {#each filtered as tour}
-        <a href="/tours/{tour.id}"
-          class="group rounded-2xl bg-white border border-stone-100 shadow-sm overflow-hidden hover:shadow-lg transition-all hover:-translate-y-1">
-          <div class="flex h-40 items-center justify-center text-6xl"
-            style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
+    <p class="results-copy">{filtered.length} tour{filtered.length !== 1 ? 's' : ''} found</p>
+    <div class="tour-grid">
+      {#each filtered as tour (tour.id)}
+        <button type="button" class="tour-card" on:click={() => (window.location.href = `/tours/${tour.id}`)}>
+          <div class="tour-card__media">
             {tour.emoji || '🗺️'}
           </div>
-          <div class="p-5">
-            <div class="mb-1 flex items-start justify-between">
-              <h3 class="font-bold text-stone-800 group-hover:text-amber-700 transition-colors leading-tight">
+          <div class="tour-card__body">
+            <div class="tour-card__topline">
+              <h3>
                 {tour.title}
               </h3>
-              <span class="ml-2 shrink-0 text-xs text-amber-600 font-semibold">⭐ {tour.rating}</span>
+              <span>⭐ {tour.rating}</span>
             </div>
-            <p class="mb-3 text-xs text-stone-500">📍 {tour.location} · ⏱ {tour.duration}</p>
-            <div class="flex items-center justify-between">
-              <span class="text-lg font-extrabold text-amber-800">
+            <p class="tour-card__meta">📍 {tour.location} · ⏱ {tour.duration}</p>
+            <div class="tour-card__footer">
+              <span class="tour-card__price">
                 R{tour.price?.toLocaleString()}
               </span>
-              <span class="rounded-lg bg-amber-700 px-3 py-1 text-xs font-semibold text-white group-hover:bg-amber-600 transition-colors">
+              <span class="tour-card__cta">
                 Book now
               </span>
             </div>
           </div>
-        </a>
+        </button>
       {/each}
     </div>
   {/if}
-</div>
+  </div>
+</section>
+
+<style>
+  .page-shell {
+    width: min(1200px, calc(100% - 2rem));
+    margin: 0 auto;
+  }
+
+  .tours-hero,
+  .tours-content {
+    padding: 2.5rem 0;
+  }
+
+  .hero-inner {
+    max-width: 58rem;
+  }
+
+  .eyebrow {
+    margin: 0 0 0.8rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #d4a017;
+  }
+
+  h1,
+  h3,
+  .tour-card__price {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    color: #f0f2f5;
+  }
+
+  h1 {
+    font-size: clamp(2.3rem, 5vw, 3.8rem);
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    font-size: 1.35rem;
+  }
+
+  .hero-copy,
+  .results-copy,
+  .tour-card__meta,
+  .tour-card__topline span {
+    color: rgba(240, 242, 245, 0.72);
+    line-height: 1.7;
+  }
+
+  .search-shell {
+    margin-top: 1.5rem;
+    max-width: 34rem;
+  }
+
+  .search-input {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.9rem;
+    background: rgba(30, 42, 58, 0.94);
+    color: #f0f2f5;
+    padding: 1rem 1.1rem;
+    font: inherit;
+  }
+
+  .tour-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .tour-card,
+  .tour-skeleton {
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(30, 42, 58, 0.94);
+    text-decoration: none;
+  }
+
+  .tour-card {
+    padding: 0;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .tour-skeleton {
+    height: 18rem;
+    background: linear-gradient(135deg, rgba(37, 48, 68, 0.96), rgba(26, 34, 51, 0.96));
+  }
+
+  .tour-card__media {
+    display: grid;
+    place-items: center;
+    height: 10rem;
+    font-size: 3.2rem;
+    background: linear-gradient(135deg, #2a3a52, #1a2a3e);
+  }
+
+  .tour-card__body {
+    padding: 1.25rem;
+  }
+
+  .tour-card__topline,
+  .tour-card__footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: start;
+  }
+
+  .tour-card__meta {
+    margin: 0.65rem 0 1rem;
+  }
+
+  .tour-card__price {
+    font-size: 1.45rem;
+  }
+
+  .tour-card__cta {
+    border-radius: 999px;
+    background: #d4a017;
+    color: #fff;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  @media (max-width: 900px) {
+    .tour-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
