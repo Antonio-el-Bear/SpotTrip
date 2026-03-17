@@ -1,2 +1,0 @@
-C:\Users\User\Documents\cloud uko\apps\toursim app\tourguide2.0\app\tourguide-frontend-fresh\project structure\workspace\launcher\TravelRecordLauncher\publish\TravelRecordLauncher.pdb
-C:\Users\User\Documents\cloud uko\apps\toursim app\tourguide2.0\app\tourguide-frontend-fresh\project structure\workspace\launcher\TravelRecordLauncher\publish\TravelRecordLauncher.exe
