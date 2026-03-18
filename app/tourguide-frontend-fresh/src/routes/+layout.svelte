@@ -4,6 +4,7 @@
 	import { page } from '$app/stores';
 	import { auth } from '$lib/stores/auth';
 	import Compass from 'lucide-svelte/icons/compass';
+	import Navbar from '$lib/components/Navbar.svelte'; // Assuming the Navbar component is located here
 
 	type LayoutUser = {
 		email?: string;
@@ -58,35 +59,9 @@
 </svelte:head>
 
 <div class="app-shell">
-	<header class={headerClass}>
-		<div class="shell-container header__inner">
-			<a class="brand" href="/">
-				<span class="brand__mark"><Compass size={20} /></span>
-				<span>
-					<strong>TourGuide</strong>
-					<small>Structured Travel Documentation</small>
-				</span>
-			</a>
 
-			<nav class="nav">
-				{#each navLinks as link}
-					<a class:nav__link--active={pathname === link.href} class="nav__link" href={link.href}>{link.label}</a>
-				{/each}
-			</nav>
 
-			<div class="header__actions">
-				{#if user}
-					<div class="user-chip">
-						<span class="user-chip__label">Signed in</span>
-						<strong>{displayName}</strong>
-					</div>
-				{:else}
-					<a class="button button--ghost" href="/dashboard">Member Area</a>
-					<a class="button button--gold" href="/contact">Get Started</a>
-				{/if}
-			</div>
-		</div>
-	</header>
+	<Navbar />
 
 	<main>
 		<slot />

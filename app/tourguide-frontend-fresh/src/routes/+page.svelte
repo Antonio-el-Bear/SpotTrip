@@ -1,59 +1,127 @@
 
+
 <script lang="ts">
-	const stats = [
-		{ icon: '📄', value: '2,840', label: 'Documented Trips' },
-		{ icon: '👥', value: '1,120', label: 'Registered Members' },
-		{ icon: '🌍', value: '147', label: 'Countries Covered' }
-	];
-
-	const trips = [
-		{ emoji: '🇯🇵', country: 'Japan', name: 'Tokyo & Kyoto Explorer', meta: '14 days · Cultural' },
-		{ emoji: '🇵🇪', country: 'Peru', name: 'Inca Trail & Sacred Valley', meta: '10 days · Adventure' },
-		{ emoji: '🇳🇴', country: 'Norway', name: 'Fjords & Northern Lights', meta: '8 days · Nature' }
-	];
-
-	const authors = [
-		{ initials: 'MV', name: 'Marco Visconti', trips: '47 documented trips', specialty: 'Europe & Asia' },
-		{ initials: 'SL', name: 'Sarah Lin', trips: '31 documented trips', specialty: 'South America' },
-		{ initials: 'JP', name: 'James Patel', trips: '58 documented trips', specialty: 'Middle East & Africa' }
-	];
-
-	const overview = [
-		'Structured travel knowledge repository curated by serious travellers and consultants.',
-		'Comprehensive trip records with itineraries, logistics, and cost context.',
-		'Access to experienced trip authors for practical planning guidance.',
-		'Searchable documentation built to support informed travel decisions.'
-	];
-
-	const pillars = [
-		'Structured Travel Knowledge Repository',
-		'Comprehensive Trip Records',
-		'Access to Experienced Travellers',
-		'Practical Trip Planning Support',
-		'Professional Information Environment'
-	];
+import Navbar from '$lib/components/Navbar.svelte';
+import SearchBar from '$lib/components/SearchBar.svelte';
+import Button from '$lib/components/Button.svelte';
+import FeaturedTripCard from '$lib/components/FeaturedTripCard.svelte';
+import FeaturedAuthorCard from '$lib/components/FeaturedAuthorCard.svelte';
+import MembershipOptions from '$lib/components/MembershipOptions.svelte';
+import AITripBuilderPromo from '$lib/components/AITripBuilderPromo.svelte';
+import Footer from '$lib/components/Footer.svelte';
+const stats = [
+	{ icon: '📄', value: '2,840', label: 'Documented Trips' },
+	{ icon: '👥', value: '1,120', label: 'Registered Members' },
+	{ icon: '🌍', value: '147', label: 'Countries Covered' }
+];
+const trips = [
+	{
+		title: 'Sustainable Communities of the Peruvian Highlands',
+		member: 'DH',
+		memberRole: 'Member',
+		memberBy: 'Dr. Helena Vasquez',
+		country: 'Peru',
+		days: '14 days',
+		price: '$2,500 – $5,000',
+		tags: ['Community-based Tourism', 'Sustainable Tourism', 'Cultural Tourism'],
+		avatar: 'DH'
+	},
+	{
+		title: 'Silk Road Heritage: Uzbekistan Corridor',
+		member: 'JW',
+		memberRole: 'Member',
+		memberBy: 'James Worthington',
+		country: 'Uzbekistan',
+		days: '17 days',
+		price: '$2,500 – $5,000',
+		tags: ['Heritage Tourism', 'Cultural Tourism', 'Educational Tourism'],
+		avatar: 'JW'
+	},
+	{
+		title: 'Culinary Heritage Trail: Northern Spain',
+		member: 'AT',
+		memberRole: 'Member',
+		memberBy: 'Akiko Tanaka',
+		country: 'Spain',
+		days: '11 days',
+		price: '$2,500 – $5,000',
+		tags: ['Gastronomy Tourism', 'Cultural Tourism', 'Sustainable Tourism'],
+		avatar: 'AT'
+	}
+];
+const authors = [
+	{
+		initials: 'DH',
+		name: 'Dr. Helena Vasquez',
+		countries: 'Peru, Colombia, Ecuador +7',
+		trips: 24,
+		bio: 'Independent travel researcher with over 15 years of experience documenting sustainable tourism practices across South America and Southeast Asia. Specializes in community-based tourism assessment and ecotourism development frameworks.',
+		rate: 'USD 45/s',
+		tags: ['Community-based Tourism', 'Sustainable Tourism', 'Ecotourism', 'Cultural Tourism', '+2 more'],
+		offerType: 'Free & Paid'
+	},
+	{
+		initials: 'JW',
+		name: 'James Worthington',
+		countries: 'Georgia, Armenia, Azerbaijan +6',
+		trips: 18,
+		bio: 'Former diplomatic attaché and cultural heritage consultant. Extensive travel documentation across Central Asia and the Caucasus region, with a focus on Silk Road heritage sites and traditional craftsmanship.',
+		rate: 'EUR 80/s',
+		tags: ['Heritage Tourism', 'Cultural Tourism', 'Educational Tourism'],
+		offerType: 'Paid'
+	},
+	{
+		initials: 'AT',
+		name: 'Akiko Tanaka',
+		countries: 'Japan, South Korea, Taiwan +6',
+		trips: 31,
+		bio: 'Gastronomy tourism specialist and culinary anthropologist. Documents food traditions, local markets, and culinary heritage across East Asia and the Mediterranean. Published author on sustainable food tourism.',
+		rate: 'Free',
+		tags: ['Gastronomy Tourism', 'Cultural Tourism', 'Sustainable Tourism', 'Heritage Tourism'],
+		offerType: 'Free'
+	}
+];
+const overview = [
+	'Structured travel knowledge repository curated by serious travellers and consultants.',
+	'Comprehensive trip records with itineraries, logistics, and cost context.',
+	'Access to experienced trip authors for practical planning guidance.',
+	'Searchable documentation built to support informed travel decisions.'
+];
+const pillars = [
+	'Structured Travel Knowledge Repository',
+	'Comprehensive Trip Records',
+	'Access to Experienced Travellers',
+	'Practical Trip Planning Support',
+	'Professional Information Environment'
+];
 </script>
 
 <svelte:head>
 	<title>TourGuide · Home</title>
 </svelte:head>
 
+<Navbar />
+
 <section class="hero">
 	<div class="page-container hero__inner">
 		<p class="eyebrow">Passionate Travel Directory</p>
 		<h1>Structured Travel Documentation</h1>
 		<p class="hero__copy">
-			Not a travel blog or social network. TourGuide is a structured platform where serious
-			travellers document journeys, compare routes, and share practical planning knowledge.
+			Not a travel blog or social network — a platform where passionate, serious travelers document their journeys.
 		</p>
+		<SearchBar />
 		<div class="pill-row">
 			{#each pillars as pillar}
 				<span>{pillar}</span>
 			{/each}
 		</div>
 		<div class="hero__actions">
-			<a class="button button--gold" href="/tours">Explore Destinations</a>
-			<a class="button button--ghost" href="/dashboard">Open Member Area</a>
+			<Button variant="gold" className="w-full" on:click={() => window.location.href = '/tours'}>
+				Explore Destinations
+			</Button>
+			<Button variant="ghost" className="w-full" on:click={() => window.location.href = '/dashboard'}>
+				Open Member Area
+			</Button>
 		</div>
 	</div>
 </section>
@@ -81,14 +149,7 @@
 		</div>
 		<div class="card-grid">
 			{#each trips as trip}
-				<a class="trip-card" href="/tours">
-					<div class="trip-card__media">{trip.emoji}</div>
-					<div class="trip-card__body">
-						<p class="trip-card__country">{trip.country}</p>
-						<h3>{trip.name}</h3>
-						<p>{trip.meta}</p>
-					</div>
-				</a>
+				<FeaturedTripCard {...trip} />
 			{/each}
 		</div>
 	</div>
@@ -105,16 +166,14 @@
 		</div>
 		<div class="card-grid">
 			{#each authors as author}
-				<article class="author-card">
-					<div class="author-card__avatar">{author.initials}</div>
-					<h3>{author.name}</h3>
-					<p>{author.trips}</p>
-					<small>{author.specialty}</small>
-				</article>
+				<FeaturedAuthorCard {...author} />
 			{/each}
 		</div>
 	</div>
 </section>
+<MembershipOptions />
+
+<AITripBuilderPromo />
 
 <section class="section">
 	<div class="page-container overview">
@@ -130,17 +189,9 @@
 	</div>
 </section>
 
-<section class="cta">
-	<div class="page-container cta__inner">
-		<h2>Document Your Travel Experience</h2>
-		<p>
-			Create structured records of journeys, preserve practical insights, and help other
-			travellers make better decisions.
-		</p>
-		<a class="button button--gold" href="/contact">Contact the Team</a>
-	</div>
-</section>
 
+
+<Footer />
 <style>
 	.page-container {
 		width: min(1200px, calc(100% - 2rem));
